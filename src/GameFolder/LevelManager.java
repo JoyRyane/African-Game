@@ -9,12 +9,12 @@ public class LevelManager {
 
     private LevelManager() {
         levels = new ArrayList<>();
-        levels.add(new ShapeLevel("LEVEL 1", false, true));
-        levels.add(new ShapeLevel("LEVEL 2", false, false));
-        levels.add(new ShapeLevel("LEVEL 3", true, false));
-        levels.add(new ShapeLevel("LEVEL 4", true, false));
-        levels.add(new ShapeLevel("LEVEL 5", true, false));
-        levels.add(new ShapeLevel("LEVEL 6", true, false));
+        levels.add(new ShapeLevel("LEVEL 1", false, true, 0));
+        levels.add(new ShapeLevel("LEVEL 2", false, false, 1));
+        levels.add(new ShapeLevel("LEVEL 3", true, false, 2));
+        levels.add(new ShapeLevel("LEVEL 4", true, false, 3));
+        levels.add(new ShapeLevel("LEVEL 5", true, false, 4));
+        levels.add(new ShapeLevel("LEVEL 6", true, false, 5));
     }
 
     public static LevelManager getInstance() {

@@ -108,6 +108,8 @@ public class DailyChallengeDialog extends JDialog {
             @Override
             public void mouseClicked(MouseEvent e) {
                 JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(DailyChallengeDialog.this);
+                JDialog parentDialog = (JDialog) SwingUtilities.getWindowAncestor((Component) e.getSource());
+                JFrame grandParentFrame = (JFrame) SwingUtilities.getWindowAncestor(parentDialog);
                 
                 Window[] windows = Window.getWindows();
                 for (Window window : windows) {
@@ -118,6 +120,36 @@ public class DailyChallengeDialog extends JDialog {
                         }
                     }
                 }
+                
+//                if (parentFrame instanceof LandingPageFrame) {
+//                    LandingPageFrame landingPageFrame = (LandingPageFrame) parentFrame;
+//                    landingPageFrame.removeTopRightPanel();
+//                    landingPageFrame.removeImageLabelPanel();
+////                    landingPageFrame.removeGameBoardDialog();
+//                    landingPageFrame.removeGameSelectBoardPanel();
+//                    
+//                    
+//                  
+////                    ShapeModel shapeModel = ShapeModelSingleton.getInstance(gameBoardDialog, landingPageFrame, this,
+////                            shapeMatchListener, levelTopBarPanel, levelNumber, currentIndex, level, nextLevel,catIndex, gameSelectBoardPanel);
+//
+////                    public static ShapeModel getInstance(GameBoardDialog gameBoardDialog, LandingPageFrame landingPageFrame, 
+////                     		ShapeLevelSelectDialog shapeLevelSelectDialog, ShapeMatchListener shapeMatchListener, 
+////                     		LevelTopBarPanel levelTopBarPanel,int levelNumber, int index, ShapeLevel shapeLevel, ShapeLevel nextLevel,
+////                     		int catIndex,GameSelectBoardPanel gameSelectBoardPanel)
+////                    ShapeModel shapeModel = ShapeModelSingleton.getInstance(gameBoardDialog, landingPageFrame, shapeLevelSelectDialog,
+////                            shapeMatchListener, levelTopBarPanel, 5, null, shapeLevel, shapeLevel,null, gameSelectBoardPanel);
+////                    LevelTopBarPanel levelTopBarPanel = new LevelTopBarPanel(null,landingPageFrame,gameBoardDialog,
+////                            shapeLevelSelectDialog, 5, null, null,shapeLevel,shapeLevel,shapeModel,musicController,
+////                            null, gameSelectBoardPanel);
+////                    gameBoardDialog = new GameBoardDialog(parentFrame, landingPageFrame, this, levelTopBarPanel, null, null, null, 
+////                    		null,null, gameSelectBoardPanel);
+////
+////                    landingPageFrame.setGameBoardDialog(gameBoardDialog);
+////
+////                    landingPageFrame.add(levelTopBarPanel, BorderLayout.NORTH);
+////                    gameBoardDialog.setVisible(true);
+//                }
                 
                 JDialog set = (JDialog) SwingUtilities.getWindowAncestor((Component) e.getSource());
                 set.dispose();

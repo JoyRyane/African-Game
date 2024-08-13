@@ -15,19 +15,33 @@ public class RewardDialog extends JDialog {
     private int increment = 5;
     private int hintsEarned, coinsEarned;
     private LevelTopBarPanel levelTopBarPanel;
+    private ShapeMatchListener shapeMatchListener;
+    private ShapeLevel shapeLevel, nextLevel;
+    private ShapeLevelSelectDialog shapeLevelSelectDialog;
 
     
-    public RewardDialog(JFrame parent, LevelTopBarPanel levelTopBarPanel, int hintsEarned, int coinsEarned) { 
+    public RewardDialog(JFrame parent, LevelTopBarPanel levelTopBarPanel,ShapeMatchListener shapeMatchListener,
+    		ShapeLevel shapeLevel,ShapeLevel nextLevel,ShapeLevelSelectDialog shapeLevelSelectDialog, int hintsEarned, int coinsEarned) { 
         super(parent, "Popup Dialog", false);
         this.levelTopBarPanel = levelTopBarPanel;
+        this.shapeMatchListener = shapeMatchListener;
+        this.shapeLevelSelectDialog = shapeLevelSelectDialog;
+        this.shapeLevel = shapeLevel;
+        this.nextLevel = nextLevel;
         this.hintsEarned = hintsEarned;
         this.coinsEarned = coinsEarned;
         initUI(); 
         layoutUI();
         handleEventsUI();
         startAnimation();
+
+        levelTopBarPanel.removeFromParent();
+//        levelTopBarPanel.test();
+        levelTopBarPanel.addReward(hintsEarned, coinsEarned);
+        levelTopBarPanel.increaseProgressBar(17);
+        levelTopBarPanel.increaseScore(10);
         
-//        levelTopBarPanel.addReward(hintsEarned, coinsEarned);
+        shapeMatchListener.onAllShapesMatched();
         
  }  
  
@@ -36,7 +50,6 @@ public class RewardDialog extends JDialog {
         this.addComponentListener(new ComponentAdapter() { 
             @Override 
             public void componentResized(ComponentEvent e) { 
-                updateLayout();
             }
         });
   
@@ -101,22 +114,7 @@ public class RewardDialog extends JDialog {
         this.setMaximumSize(new Dimension(500,400));
         
         this.setLocationRelativeTo(getParent());
-//        this.updateLayout();
     }
-
-    private void updateLayout() {
-        Dimension parentSize = getParent().getSize();
-        int width = parentSize.width;
-
-        if (width < 500) {
-            layoutUI1();
-        } else if (width >= 500 && width <= 800) {
-            layoutUI2();
-        } else {
-            layoutUI3();
-        }
-    }
-    
     private void startAnimation() {
         animationTimer = new Timer(25, new ActionListener() {
             @Override
@@ -131,30 +129,6 @@ public class RewardDialog extends JDialog {
             }
         });
         animationTimer.start();
-    }
-    
-//    private void handleClose() {
-        // Add the earned coins and hints to the LevelTopBarPanel
-//        levelTopBarPanel.addCoins(coinsEarned);
-//        levelTopBarPanel.addHints(hintsEarned);
-//    }
-
-    private void layoutUI1() {
-//        label.setIconTextGap(5);
-//        label.setIcon(resizeIcon(10, 10));
-//        label.setFont(new Font(label.getFont().getName(), Font.BOLD | Font.ITALIC, 10)); 
-    }
-
-    private void layoutUI2() {
-//        label.setIconTextGap(5);
-//        label.setIcon(resizeIcon(30, 30));
-//        label.setFont(new Font(label.getFont().getName(), Font.BOLD | Font.ITALIC, 20)); 
-    }
-
-    private void layoutUI3() {
-//        label.setIconTextGap(5);
-//        label.setIcon(resizeIcon(50, 50));
-//        label.setFont(new Font(label.getFont().getName(), Font.BOLD | Font.ITALIC, 25)); 
     }
 
     private void updatePosition() {

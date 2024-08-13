@@ -51,6 +51,25 @@ public class LimitDialog extends JDialog {
         button.setForeground(Color.WHITE);
         button.setFocusPainted(false);
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        button.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(LimitDialog.this);
+                
+                Window[] windows = Window.getWindows();
+                for (Window window : windows) {
+                    if (window instanceof JDialog && window.getOwner() == parentFrame) {
+                        JDialog dialog = (JDialog) window;
+                        if (dialog instanceof DailyLimitBackgroundDialog) {
+                            dialog.dispose();
+                        }
+                    }
+                }
+                
+                JDialog set = (JDialog) SwingUtilities.getWindowAncestor((Component) e.getSource());
+                set.dispose();
+            }
+        });
         
         ImageIcon closeIcon = new ImageIcon("icon\\close.png");
         Image closeImg = closeIcon.getImage();

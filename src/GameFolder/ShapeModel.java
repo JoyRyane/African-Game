@@ -23,27 +23,32 @@ public class ShapeModel extends JComponent {
     private Timer confettiTimer, blinkingTimer;
     private LevelCompletedBackgroundDialog levelCompletedBackgroundDialog;
     private LandingPageFrame landingPageFrame;
-    private GameBoardDialog parentDialog;
+    private GameBoardDialog gameBoardDialog;
     private ShapeLevelSelectDialog shapeLevelSelectDialog;
     private ShapeMatchListener shapeMatchListener;
-    private int levelNumber,index;
+    private int levelNumber,index, catIndex;
     LevelTopBarPanel levelTopBarPanel;
-    private ShapeLevel shapeLevel;
+    private ShapeLevel shapeLevel, nextLevel;
     private NextLevelBackgroundDialog nextLevelBackgroundDialog;
+    private GameSelectBoardPanel gameSelectBoardPanel;
     private Clip clip;
     
-    public ShapeModel(GameBoardDialog parentDialog, LandingPageFrame landingPageFrame, 
+    public ShapeModel(GameBoardDialog gameBoardDialog, LandingPageFrame landingPageFrame, 
     		ShapeLevelSelectDialog shapeLevelSelectDialog, ShapeMatchListener shapeMatchListener, 
-    		LevelTopBarPanel levelTopBarPanel,int levelNumber, int index, ShapeLevel shapeLevel) {
+    		LevelTopBarPanel levelTopBarPanel,int catIndex,int levelNumber, int index, ShapeLevel shapeLevel, ShapeLevel nextLevel,
+    		GameSelectBoardPanel gameSelectBoardPanel) {
     	
-    	this.parentDialog = parentDialog;
+    	this.gameBoardDialog = gameBoardDialog;
     	this.landingPageFrame = landingPageFrame;
     	this.shapeLevelSelectDialog = shapeLevelSelectDialog;
     	this.shapeMatchListener = shapeMatchListener;
     	this.levelTopBarPanel = levelTopBarPanel;
     	this.levelNumber = levelNumber;
     	this.index = index;
-    	this.shapeLevel = shapeLevel; 
+    	this.shapeLevel = shapeLevel;
+    	this.nextLevel = nextLevel;
+    	this.gameSelectBoardPanel = gameSelectBoardPanel;
+    	this.catIndex = catIndex;
 
     	initializeShapesForLevels();
         
@@ -53,8 +58,7 @@ public class ShapeModel extends JComponent {
         completionLabel.setBounds(250, 100, 300, 100);
         setLayout(null);
         add(completionLabel);
-//        System.out.println(index);
-
+        
         addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
                 mousePt = e.getPoint();
@@ -70,7 +74,8 @@ public class ShapeModel extends JComponent {
                   boolean intersected = false;
                   for (ShapeInfo unmovableShape : unmovableShapes) {
                       if (selectedShape.intersects(unmovableShape)) {
-                          if (selectedShape.getType() == unmovableShape.getType() && selectedShape.getColor() == unmovableShape.getColor()) {
+                          if (selectedShape.getType() == unmovableShape.getType() && 
+                        		  selectedShape.getColor() == unmovableShape.getColor()) {
                               intersected = true;
                               playSound("audio\\sound.wav");
                               checkAllMatched();
@@ -114,7 +119,6 @@ public class ShapeModel extends JComponent {
                 repaint();
             }
         });
-        highlightUnmatchedShapes();
   }
     
     public void setShapeHighlighted(int index, boolean highlighted) {
@@ -159,7 +163,10 @@ public class ShapeModel extends JComponent {
 	      }
 	  });
 	  blinkingTimer.start();
+//    	System.out.println("HighlightUnmatchedShapes called!");
     }
+    
+    
 
     private boolean isShapeMatched(ShapeInfo movable) {
         for (ShapeInfo unmovable : unmovableShapes) {
@@ -171,8 +178,6 @@ public class ShapeModel extends JComponent {
         }
         return false;
     }
-
-
 
     private void initializeShapesForLevels() {
 		// TODO Auto-generated method stub
@@ -227,12 +232,15 @@ public class ShapeModel extends JComponent {
 	@Override
     public void removeNotify() {
         super.removeNotify();
-        blinkingTimer.stop();
+        if (blinkingTimer != null) {
+            blinkingTimer.stop();
+        }
     }
 	
     private void checkCollisions(ShapeInfo movableShape) {
         for (ShapeInfo unmovableShape : unmovableShapes) {
-            if (movableShape.getType() == unmovableShape.getType() && movableShape.getColor() == unmovableShape.getColor()) {
+            if (movableShape.getType() == unmovableShape.getType() &&
+            		movableShape.getColor() == unmovableShape.getColor()) {
                 if (movableShape != unmovableShape && movableShape.intersects(unmovableShape)) {
                     pullShapes(movableShape, unmovableShape);
                 }
@@ -255,7 +263,7 @@ public class ShapeModel extends JComponent {
         return null;
     }
 
-    private void playSound(String soundFile) {
+    public void playSound(String soundFile) {
         try {
             File soundPath = new File(soundFile);
             if (soundPath.exists()) {
@@ -318,61 +326,22 @@ public class ShapeModel extends JComponent {
 	                completionLabel.setVisible(false);
 	                ((Timer) e.getSource()).stop();
 	
-	                if (parentDialog != null) {
-	                    parentDialog.closeDialog();
+	                if (gameBoardDialog != null) {
+	                    gameBoardDialog.closeDialog();
 	                }
-//	                System.out.println(shapeLevel.isCompleted());
-	
-//	                if (landingPageFrame != null && !shapeLevel.isCompleted()) {
 	                stopSound();
-	                    levelCompletedBackgroundDialog = new LevelCompletedBackgroundDialog(landingPageFrame,
-	                    		shapeLevelSelectDialog,levelTopBarPanel, levelNumber, index);
-	                    levelCompletedBackgroundDialog.setVisible(true);
-	                    
-	                    shapeMatchListener.onAllShapesMatched();
-//	                }
-//	                if(landingPageFrame != null && shapeLevel.isCompleted()) {
-//	                	nextLevelBackgroundDialog = new NextLevelBackgroundDialog(landingPageFrame, 
-//	                			shapeLevelSelectDialog, levelTopBarPanel, levelNumber, index);
-//	                	nextLevelBackgroundDialog.setVisible(true);
-//	                	stopSound();
-//////	                    shapeMatchListener.onAllShapesMatched();
-////
-//	                }
 	                
-//	                if(landingPageFrame != null) {
-//	                	if(!shapeLevel.isCompleted()) {
-//	                		levelCompletedBackgroundDialog = new LevelCompletedBackgroundDialog(landingPageFrame,
-//		                    		shapeLevelSelectDialog,levelTopBarPanel, levelNumber, index);
-//		                    levelCompletedBackgroundDialog.setVisible(true);
-//		                    shapeMatchListener.onAllShapesMatched();
-//	                	}else {
-//	                		nextLevelBackgroundDialog = new NextLevelBackgroundDialog(landingPageFrame, 
-//		                			shapeLevelSelectDialog, levelTopBarPanel, levelNumber, index);
-//		                	nextLevelBackgroundDialog.setVisible(true);
-////		                    shapeMatchListener.onAllShapesMatched();
-//	                	}
-//	                }
-	                
-//	                if (shapeLevel != null) {
-//	                    System.out.println("shapeLevel.isCompleted(): " + shapeLevel.isCompleted());
-//	                    System.out.println("shapeLevel.isLocked(): " + shapeLevel.isLocked());
-//
-//	                    if (landingPageFrame != null && !shapeLevel.isCompleted()) {
-//	                        System.out.println("Displaying LevelCompletedBackgroundDialog");
-//	                        levelCompletedBackgroundDialog = new LevelCompletedBackgroundDialog(
-//	                            landingPageFrame, shapeLevelSelectDialog, levelTopBarPanel, levelNumber, index);
-//	                        levelCompletedBackgroundDialog.setVisible(true);
-//	                        shapeMatchListener.onAllShapesMatched();
-//	                    } else if (landingPageFrame != null && shapeLevel.isCompleted()) {
-//	                        System.out.println("Displaying NextLevelBackgroundDialog");
-//	                        nextLevelBackgroundDialog = new NextLevelBackgroundDialog(
-//	                            landingPageFrame, shapeLevelSelectDialog, levelTopBarPanel, levelNumber, index);
-//	                        nextLevelBackgroundDialog.setVisible(true);
-//	                    }
-//	                } else {
-//	                    System.out.println("shapeLevel is null");
-//	                }
+	                if(!shapeLevel.isCompleted()) {
+	                	levelCompletedBackgroundDialog = new LevelCompletedBackgroundDialog(landingPageFrame,
+	    	                    shapeLevelSelectDialog,levelTopBarPanel,shapeMatchListener,shapeLevel,nextLevel, levelNumber, index,
+	    	                    landingPageFrame,catIndex, gameSelectBoardPanel);
+	    	                levelCompletedBackgroundDialog.setVisible(true);
+	                }else {
+	                	nextLevelBackgroundDialog = new NextLevelBackgroundDialog(landingPageFrame, shapeLevelSelectDialog,levelTopBarPanel,
+	                			shapeLevel,nextLevel,shapeMatchListener,levelNumber,index, landingPageFrame,catIndex, gameSelectBoardPanel); 
+	                	nextLevelBackgroundDialog.setVisible(true);
+	                	
+	                }
 	            }
         });
         timer.setRepeats(false);
@@ -395,12 +364,13 @@ public class ShapeModel extends JComponent {
         private Color color;
         private ShapeType type;
         private boolean filled;
-        private boolean highlighted; // New field to track highlighted state
-        private boolean blinking; // New field to track blinking state
-        private boolean blinkingVisible; // New field to track visibility during blinking
+        private boolean highlighted; 
+        private boolean blinking; 
+        private boolean blinkingVisible; 
         private ShapeInfo counterpart;
         
-        public ShapeInfo(int x, int y, int width, int height, Color color, ShapeType type, boolean filled, boolean highlighted, boolean blinking) {
+        public ShapeInfo(int x, int y, int width, int height, Color color, ShapeType type, boolean filled, 
+        		boolean highlighted, boolean blinking) {
             this.x = x;
             this.y = y;
             this.width = width;
@@ -408,7 +378,7 @@ public class ShapeModel extends JComponent {
             this.color = color;
             this.type = type;
             this.filled = filled;
-            this.highlighted = highlighted; // Initialize as not highlighted
+            this.highlighted = highlighted; 
             this.blinking = blinking;
             this.blinkingVisible = true;
         }
@@ -465,19 +435,19 @@ public class ShapeModel extends JComponent {
                 Polygon triangle = new Polygon(new int[]{x, x + width / 2, x + width}, new int[]{y + height, y, y + height}, 3);
                 return triangle.contains(p);
             } else if (type == ShapeType.STAR) {
-                Polygon star = createStar(x + width / 2, y + height / 2, width / 2, height / 4, 5);
+                Polygon star = CreateShapes.createStar(x + width / 2, y + height / 2, width / 2, height / 4, 5);
                 return star.contains(p);
             } else if (type == ShapeType.RHOMBUS) {
-                Polygon rhombus = createRhombus(x + width / 2, y + height / 2, width / 2, height / 2);
+                Polygon rhombus = CreateShapes.createRhombus(x + width / 2, y + height / 2, width / 2, height / 2);
                 return rhombus.contains(p);
             }else if (type == ShapeType.HEART) {
-                Polygon heart = createHeart(x, y, width, height);
+                Polygon heart = CreateShapes.createHeart(x, y, width, height);
                 return heart.contains(p);
             }else if (type == ShapeType.TRAPEZIUM) {
-                Polygon trapezium = createTrapezium(x, y, width, height);
+                Polygon trapezium = CreateShapes.createTrapezium(x, y, width, height);
                 return trapezium.contains(p);
             } else if (type == ShapeType.PARALLELOGRAM) {
-                Polygon parallelogram = createParallelogram(x, y, width, height);
+                Polygon parallelogram = CreateShapes.createParallelogram(x, y, width, height);
                 return parallelogram.contains(p);
             }
             return false;
@@ -525,70 +495,6 @@ public class ShapeModel extends JComponent {
         public ShapeType getType() {
             return type;
         }
-
-//        public void draw(Graphics g) {
-//            g.setColor(color);
-//            ((Graphics2D) g).setStroke(new BasicStroke(3));
-//            if (highlighted) {
-//                ((Graphics2D) g).setStroke(new BasicStroke(5)); // Thicker stroke for highlighted shape
-//            }
-//            if (type == ShapeType.RECTANGLE) {
-//                if (filled) {
-//                    g.fillRect(x, y, width, height);
-//                } else {
-//                    g.drawRect(x, y, width, height);
-//                }
-//            } else if (type == ShapeType.ELLIPSE) {
-//                if (filled) {
-//                    g.fillOval(x, y, width, height);
-//                } else {
-//                    g.drawOval(x, y, width, height);
-//                }
-//            } else if (type == ShapeType.TRIANGLE) {
-//                int[] xPoints = new int[]{x, x + width / 2, x + width};
-//                int[] yPoints = new int[]{y + height, y, y + height};
-//                if (filled) {
-//                    g.fillPolygon(xPoints, yPoints, 3);
-//                } else {
-//                    g.drawPolygon(xPoints, yPoints, 3);
-//                }
-//            } else if (type == ShapeType.STAR) {
-//                Polygon star = createStar(x + width / 2, y + height / 2, width / 2, height / 4, 5);
-//                if (filled) {
-//                    g.fillPolygon(star);
-//                } else {
-//                    g.drawPolygon(star);
-//                }
-//            } else if (type == ShapeType.RHOMBUS) {
-//                Polygon rhombus = createRhombus(x + width / 2, y + height / 2, width / 2, height / 2);
-//                if (filled) {
-//                    g.fillPolygon(rhombus);
-//                } else {
-//                    g.drawPolygon(rhombus);
-//                }
-//            }else if (type == ShapeType.HEART) {
-//                Polygon heart = createHeart(x, y, width, height);
-//                if (filled) {
-//                    g.fillPolygon(heart);
-//                } else {
-//                    g.drawPolygon(heart);
-//                }
-//            }else if (type == ShapeType.TRAPEZIUM) {
-//                Polygon trapezium = createTrapezium(x, y, width, height);
-//                if (filled) {
-//                    g.fillPolygon(trapezium);
-//                } else {
-//                    g.drawPolygon(trapezium);
-//                }
-//            } else if (type == ShapeType.PARALLELOGRAM) {
-//                Polygon parallelogram = createParallelogram(x, y, width, height);
-//                if (filled) {
-//                    g.fillPolygon(parallelogram);
-//                } else {
-//                    g.drawPolygon(parallelogram);
-//                }
-//            }
-//        }
         
         public void draw(Graphics g) {
             if (!blinking || blinkingVisible) {
@@ -596,7 +502,7 @@ public class ShapeModel extends JComponent {
                 Graphics2D g2 = (Graphics2D) g;
                 g2.setStroke(new BasicStroke(3));
                 if (highlighted) {
-                  ((Graphics2D) g).setStroke(new BasicStroke(5)); // Thicker stroke for highlighted shape
+                  ((Graphics2D) g).setStroke(new BasicStroke(5));
               }
 
                 if (type == ShapeType.RECTANGLE) {
@@ -611,44 +517,43 @@ public class ShapeModel extends JComponent {
                     } else {
                         g.drawOval(x, y, width, height);
                     }
-                } else if (type == ShapeType.TRIANGLE) {
-                    int[] xPoints = new int[]{x, x + width / 2, x + width};
-                    int[] yPoints = new int[]{y + height, y, y + height};
+                } else if (type == ShapeType.TRIANGLE) { 
+                	Polygon triangle = CreateShapes.createTriangle(x, y, width, height);
                     if (filled) {
-                        g.fillPolygon(xPoints, yPoints, 3);
+                    	g.fillPolygon(triangle);
                     } else {
-                        g.drawPolygon(xPoints, yPoints, 3);
+                    	g.drawPolygon(triangle);
                     }
                 } else if (type == ShapeType.STAR) {
-                    Polygon star = createStar(x + width / 2, y + height / 2, width / 2, height / 4, 5);
+                    Polygon star = CreateShapes.createStar(x + width / 2, y + height / 2, width / 2, height / 4, 5);
                     if (filled) {
                         g.fillPolygon(star);
                     } else {
                         g.drawPolygon(star);
                     }
                 } else if (type == ShapeType.RHOMBUS) {
-                    Polygon rhombus = createRhombus(x + width / 2, y + height / 2, width / 2, height / 2);
+                    Polygon rhombus = CreateShapes.createRhombus(x + width / 2, y + height / 2, width / 2, height / 2);
                     if (filled) {
                         g.fillPolygon(rhombus);
                     } else {
                         g.drawPolygon(rhombus);
                     }
                 } else if (type == ShapeType.HEART) {
-                    Polygon heart = createHeart(x, y, width, height);
+                    Polygon heart = CreateShapes.createHeart(x, y, width, height);
                     if (filled) {
                         g.fillPolygon(heart);
                     } else {
                         g.drawPolygon(heart);
                     }
                 } else if (type == ShapeType.TRAPEZIUM) {
-                    Polygon trapezium = createTrapezium(x, y, width, height);
+                    Polygon trapezium = CreateShapes.createTrapezium(x, y, width, height);
                     if (filled) {
                         g.fillPolygon(trapezium);
                     } else {
                         g.drawPolygon(trapezium);
                     }
                 } else if (type == ShapeType.PARALLELOGRAM) {
-                    Polygon parallelogram = createParallelogram(x, y, width, height);
+                    Polygon parallelogram = CreateShapes.createParallelogram(x, y, width, height);
                     if (filled) {
                         g.fillPolygon(parallelogram);
                     } else {
@@ -658,25 +563,6 @@ public class ShapeModel extends JComponent {
             }
         }
         
-        private Polygon createRhombus(int centerX, int centerY, int halfWidth, int halfHeight) {
-        	return CreateShapes.createRhombus(centerX, centerY, halfWidth, halfHeight);
-        }
-
-        private Polygon createStar(int centerX, int centerY, int outerRadius, int innerRadius, int numPoints) {
-        	return CreateShapes.createStar(centerX, centerY, outerRadius, innerRadius, numPoints);
-        }
-        
-        private Polygon createHeart(int x, int y, int width, int height) {
-        	return CreateShapes.createHeart(x, y, width, height);
-        }
-        
-        private Polygon createParallelogram(int x, int y, int width, int height) {
-            return CreateShapes.createParallelogram(x, y, width, height);
-        }
-        
-        private Polygon createTrapezium(int x, int y, int width, int height) {
-            return CreateShapes.createTrapezium(x, y, width, height);
-        }
     }
     
     public void stopSound() {

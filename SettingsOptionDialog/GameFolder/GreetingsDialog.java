@@ -52,20 +52,34 @@ public class GreetingsDialog extends JDialog {
 
         JLabel imageLabel = new JLabel();
         imageLabel.setIcon(imageIcon);
+        imageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+        imageLabel.setVerticalAlignment(SwingConstants.CENTER);
+        
+        JPanel image = new JPanel(new BorderLayout());
 
-        JLabel hello = new JLabel("<html>Good Morning<br> How are you?<br>I am glad to see you too!</html>");
+        JLabel hello = new JLabel("<html>Hello, great seeing you<br><center>again!<center></html>");
+        hello.setPreferredSize(new Dimension(300, 200));
         hello.setForeground(Color.WHITE);
         Font helloFont = hello.getFont();
-        hello.setFont(new Font(helloFont.getName(), Font.BOLD, 17));
-
+        hello.setFont(new Font(helloFont.getName(), Font.BOLD, 22));
+        hello.setHorizontalAlignment(SwingConstants.RIGHT);
+        hello.setVerticalAlignment(SwingConstants.CENTER);
+        
+        JPanel helloPanel = new JPanel(new BorderLayout());
+        helloPanel.setOpaque(false);
+        helloPanel.setPreferredSize(new Dimension(100,200));
+        helloPanel.add(hello, BorderLayout.CENTER);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.insets = new Insets(5, 5, 5, 5);
-        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.weightx = 1.0;
+        gbc.weighty = 1.0;
+        gbc.fill = GridBagConstraints.BOTH;
+        
+        contentPanel.add(helloPanel, gbc);
 
-        gbc.gridx++;
-        gbc.anchor = GridBagConstraints.EAST;
+        gbc.gridx = 1;
         contentPanel.add(imageLabel, gbc);
 
         setContentPane(contentPanel);

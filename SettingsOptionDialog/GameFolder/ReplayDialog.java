@@ -16,13 +16,14 @@ public class ReplayDialog extends JDialog {
     private ShapeLevelSelectDialog shapeLevelSelectDialog;
     private GameBoardDialog gameBoardDialog;
     private LevelTopBarPanel levelTopBarPanel;
-    private int levelNumber, index;
+    private int levelNumber, index, catIndex;
 //    private List<ShapeLevel> levels;
-    private ShapeLevel shapeLevel;
+    private ShapeLevel shapeLevel, nextLevel;
+    private GameSelectBoardPanel gameSelectBoardPanel;
 
     public ReplayDialog(JFrame parent, ShapeLevelSelectDialog shapeLevelSelectDialog,
     		GameBoardDialog gameBoardDialog,LevelTopBarPanel levelTopBarPanel,int levelNumber,
-    		int index, ShapeLevel shapeLevel) {
+    		int index, ShapeLevel shapeLevel, ShapeLevel nextLevel,int catIndex, GameSelectBoardPanel gameSelectBoardPanel) {
         super(parent, "Popup Dialog", false);
         this.shapeLevelSelectDialog = shapeLevelSelectDialog;
         this.gameBoardDialog = gameBoardDialog;
@@ -31,6 +32,9 @@ public class ReplayDialog extends JDialog {
         this.index = index;
 //        this.levels = levels;
         this.shapeLevel = shapeLevel;
+        this.nextLevel = nextLevel;
+        this.gameSelectBoardPanel = gameSelectBoardPanel;
+        this.catIndex = catIndex;
         initUI();
         layoutUI();
         handleEventsUI();
@@ -132,7 +136,7 @@ public class ReplayDialog extends JDialog {
                     landingPageFrame.removeGameBoardDialog();
 
                     gameBoardDialog = new GameBoardDialog(grandParentFrame,landingPageFrame,
-                    		shapeLevelSelectDialog,levelTopBarPanel,levelNumber, index, shapeLevel);
+                    		shapeLevelSelectDialog,levelTopBarPanel,levelNumber, index, shapeLevel, nextLevel,catIndex, gameSelectBoardPanel);
                     landingPageFrame.setGameBoardDialog(gameBoardDialog);
                     gameBoardDialog.setVisible(true);
                 }

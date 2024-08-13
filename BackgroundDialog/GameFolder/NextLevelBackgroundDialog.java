@@ -9,14 +9,26 @@ public class NextLevelBackgroundDialog extends JDialog {
 	NextLevelDialog dialog;
 	ShapeLevelSelectDialog shapeLevelSelectDialog;
 	LevelTopBarPanel levelTopBarPanel;
-	private int levelNumber, index;
+	private int levelNumber, index, catIndex;
+	private ShapeLevel shapeLevel, nextLevel;
+	private ShapeMatchListener shapeMatchListener;
+	private LandingPageFrame landingPageFrame;
+	private GameSelectBoardPanel gameSelectBoardPanel;
     public NextLevelBackgroundDialog(JFrame parent,ShapeLevelSelectDialog shapeLevelSelectDialog,
-    		LevelTopBarPanel levelTopBarPanel, int levelNumber, int index) {
+    		LevelTopBarPanel levelTopBarPanel,ShapeLevel shapeLevel,ShapeLevel nextLevel,
+    		ShapeMatchListener shapeMatchListener, int levelNumber, int index,LandingPageFrame landingPageFrame,
+    		int catIndex,GameSelectBoardPanel gameSelectBoardPanel ) {
         super(parent, "Fullscreen Popup", false);
         this.shapeLevelSelectDialog = shapeLevelSelectDialog;
         this.levelTopBarPanel = levelTopBarPanel;
+        this.shapeLevel = shapeLevel;
+        this.nextLevel = nextLevel;
+        this.shapeMatchListener = shapeMatchListener;
         this.levelNumber = levelNumber;
         this.index = index;
+        this.landingPageFrame = landingPageFrame;
+        this.gameSelectBoardPanel = gameSelectBoardPanel;
+        this.catIndex = catIndex;
         parent.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentMoved(ComponentEvent e) {
@@ -34,7 +46,8 @@ public class NextLevelBackgroundDialog extends JDialog {
         setBackground(new Color(0,0,0,200));
         updateDialogSizeAndPosition();
         
-        dialog = new NextLevelDialog((JFrame) getParent(),shapeLevelSelectDialog,levelTopBarPanel ,levelNumber, index);
+        dialog = new NextLevelDialog((JFrame) getParent(),shapeLevelSelectDialog,levelTopBarPanel , shapeLevel,
+        		nextLevel,shapeMatchListener, levelNumber, index, landingPageFrame,catIndex, gameSelectBoardPanel);
         
 //        dialog.setVisible(true);
 //        

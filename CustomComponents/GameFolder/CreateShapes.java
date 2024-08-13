@@ -1,6 +1,7 @@
 package GameFolder;
 
-import java.awt.Polygon;
+import java.awt.*
+;
 
 public class CreateShapes {
 	
@@ -24,6 +25,19 @@ public class CreateShapes {
 	            star.addPoint(x, y);
 	        }
 	        return star;
+	    }
+	    
+	   public static Polygon createSquare(int centerX, int centerY, int sideLength) {
+	        int halfSide = sideLength / 2;
+	        int[] xPoints = {centerX - halfSide, centerX + halfSide, centerX + halfSide, centerX - halfSide};
+	        int[] yPoints = {centerY - halfSide, centerY - halfSide, centerY + halfSide, centerY + halfSide};
+	        return new Polygon(xPoints, yPoints, 4);
+	    }
+	    
+	    public static Polygon createTriangle(int x, int y, int width, int height) {
+	        int[] xPoints = new int[]{x, x + width / 2, x + width};
+	        int[] yPoints = new int[]{y + height, y, y + height};
+	        return new Polygon(xPoints, yPoints, 3);
 	    }
 
 	    public static Polygon createHeart(int x, int y, int width, int height) {

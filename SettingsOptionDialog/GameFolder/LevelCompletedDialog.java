@@ -14,17 +14,28 @@ public class LevelCompletedDialog extends JDialog {
     private JPanel rewardPanel, buttonPanel, languageOption;
     Timer hintTimer, coinsTimer;
     private RewardDialog dialog;
-    private int levelNumber, index;
+    private int levelNumber, index, catIndex;
     private LevelTopBarPanel levelTopBarPanel;
     private ShapeLevelSelectDialog shapeLevelSelectDialog;
+    private ShapeMatchListener shapeMatchListener;
+    private ShapeLevel shapeLevel, nextLevel;
+    private LandingPageFrame landingPageFrame;
+    private GameSelectBoardPanel gameSelectBoardPanel;
 
     public LevelCompletedDialog(JFrame parent,ShapeLevelSelectDialog shapeLevelSelectDialog,
-    		LevelTopBarPanel levelTopBarPanel, int levelNumber, int index) {
+    		LevelTopBarPanel levelTopBarPanel,ShapeMatchListener shapeMatchListener,ShapeLevel shapeLevel,
+    		ShapeLevel nextLevel,int levelNumber, int index, LandingPageFrame landingPageFrame,int catIndex, GameSelectBoardPanel gameSelectBoardPanel) {
         super(parent, "Popup Dialog", true);
         this.shapeLevelSelectDialog = shapeLevelSelectDialog;
         this.levelTopBarPanel = levelTopBarPanel;
         this.levelNumber = levelNumber;
+        this.shapeMatchListener = shapeMatchListener;
+        this.shapeLevel = shapeLevel;
+        this.nextLevel = nextLevel;
         this.index = index;
+        this.landingPageFrame = landingPageFrame;
+        this.gameSelectBoardPanel = gameSelectBoardPanel;
+        this.catIndex = catIndex;
         initUI();
         layoutUI();
         handleEventsUI();
@@ -122,26 +133,20 @@ public class LevelCompletedDialog extends JDialog {
             	JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(LevelCompletedDialog.this);
             	
                 SwingUtilities.invokeLater(() -> {
-//                    if (rewardPanel != null) {
-//                    	
-//                    	languageOption.remove(rewardPanel);
-//                    	languageOption.revalidate();
-//                    	languageOption.repaint();
-//
-//                    }
                     
                     SwingUtilities.invokeLater(() -> {
-                        dialog = new RewardDialog(parentFrame, levelTopBarPanel, 1,10);
+                        dialog = new RewardDialog(parentFrame, levelTopBarPanel,shapeMatchListener,shapeLevel,nextLevel, shapeLevelSelectDialog, 1,10);
                         dialog.setVisible(true);
                         scheduleDialogClose();
                     });
                     
                     JDialog dialog = (JDialog) SwingUtilities.getWindowAncestor((Component) e.getSource());
                     dialog.dispose();
-//                    
+                    
                     Timer timer = new Timer(7000, evt -> {
                     	NextLevelBackgroundDialog nextLevelBackgroundDialog = new NextLevelBackgroundDialog(parentFrame,
-                    			shapeLevelSelectDialog,levelTopBarPanel, levelNumber, index);
+                    			shapeLevelSelectDialog,levelTopBarPanel,shapeLevel,nextLevel, shapeMatchListener, levelNumber, index, landingPageFrame,
+                    			catIndex,gameSelectBoardPanel);
                         nextLevelBackgroundDialog.setVisible(true);
                     });
                     timer.setRepeats(false);
@@ -230,29 +235,29 @@ public class LevelCompletedDialog extends JDialog {
     }
     
     private void scheduleDialogClose() {
-        Timer closeTimer = new Timer(5000, new ActionListener() { // 3000 milliseconds = 3 seconds
+        Timer closeTimer = new Timer(5000, new ActionListener() { 
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (dialog != null && dialog.isVisible()) { // Check if the dialog is visible
-                    dialog.dispose(); // Close the dialog after the delay
+                if (dialog != null && dialog.isVisible()) { 
+                    dialog.dispose(); 
                     Window[] windows = Window.getWindows();
                     for (Window window : windows) {
                     	JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(LevelCompletedDialog.this);
                         if (window instanceof JDialog && window.getOwner() == parentFrame) {
                             JDialog dialog = (JDialog) window;
                             if (dialog instanceof LevelCompletedBackgroundDialog) {
-                                dialog.dispose(); // Close the SettingsBackgroundDialog
+                                dialog.dispose(); 
                             }
                         }
                     }
                 }
             }
         });
-        closeTimer.setRepeats(false); // Set to false to run the timer only once
+        closeTimer.setRepeats(false); 
         closeTimer.start();
     }
 
     private void updatePosition() {
-        setLocationRelativeTo(getParent()); // Update dialog's position relative to the parent frame
+        setLocationRelativeTo(getParent()); 
     }
 }

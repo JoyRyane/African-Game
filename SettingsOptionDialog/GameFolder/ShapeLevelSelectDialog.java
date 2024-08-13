@@ -1,16 +1,14 @@
 package GameFolder;
 
 import java.awt.*;
-import java.util.Properties;
 import java.awt.event.*;
 import java.io.*;
 import java.nio.file.Files;
-
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.util.List;
 import java.util.ArrayList;
-//import java.nio.file.*;
+import java.util.Properties;
 
 public class ShapeLevelSelectDialog extends JDialog implements ShapeMatchListener {
 
@@ -26,19 +24,19 @@ public class ShapeLevelSelectDialog extends JDialog implements ShapeMatchListene
     private ShapeLevel nextLevel;
     private Properties levelProperties;
     private LevelTopBarPanel levelTopBarPanel;
-    private int levelNumber, index;
+    private int levelNumber, catIndex;
     private String categoryName;
     private ShapeMatchListener shapeMatchListener;
     private BackgroundMusicController musicController;
-//    private ShapeModel shapeModel;
+    private GameSelectBoardPanel gameSelectBoardPanel;
 
-    public ShapeLevelSelectDialog(JFrame parent,String categoryName, int index, BackgroundMusicController musicController) {
+    public ShapeLevelSelectDialog(JFrame parent, String categoryName, int catIndex, BackgroundMusicController musicController,
+    		GameSelectBoardPanel gameSelectBoardPanel) {
         super(parent, "Popup Dialog", false);
-//        this.levelTopBarPanel = levelTopBarPanel;
         this.categoryName = categoryName;
-        this.index = index;
+        this.catIndex = catIndex;
         this.musicController = musicController;
-//        this.shapeModel = shapeModel;
+        this.gameSelectBoardPanel = gameSelectBoardPanel;
         loadLevelProperties();
         initUI();
         layoutUI();
@@ -46,23 +44,6 @@ public class ShapeLevelSelectDialog extends JDialog implements ShapeMatchListene
         updatePosition();
     }
 
-//    private void loadLevelProperties() {
-//        levelProperties = new Properties();
-//        try (InputStream input = new FileInputStream("resources/levels.properties")) {
-//            levelProperties.load(input);
-//        } catch (IOException ex) {
-//            ex.printStackTrace();
-//        }
-//
-//        levels = new ArrayList<>();
-//        for (int i = 1; i <= 6; i++) {
-//            String levelName = "LEVEL " + i;
-//            boolean locked = Boolean.parseBoolean(levelProperties.getProperty("level" + i + ".locked"));
-//            boolean completed = Boolean.parseBoolean(levelProperties.getProperty("level" + i + ".completed"));
-//            levels.add(new ShapeLevel(levelName, locked, completed));
-//        }
-//    }
-    
     private void loadLevelProperties() {
         levelProperties = new Properties();
         File propertiesFile = new File("resources/levels.properties");
@@ -91,10 +72,11 @@ public class ShapeLevelSelectDialog extends JDialog implements ShapeMatchListene
             String levelName = "LEVEL " + i;
             boolean locked = Boolean.parseBoolean(levelProperties.getProperty("level" + i + ".locked"));
             boolean completed = Boolean.parseBoolean(levelProperties.getProperty("level" + i + ".completed"));
-            levels.add(new ShapeLevel(levelName, locked, completed));
+            int levelIndex = Integer.parseInt(levelProperties.getProperty("level" + i + ".index"));
+            levels.add(new ShapeLevel(levelName, locked, completed, levelIndex));
         }
     }
-
+    
     private void saveLevelProperties() {
         try (OutputStream output = new FileOutputStream("resources/levels.properties")) {
             for (int i = 0; i < levels.size(); i++) {
@@ -102,11 +84,14 @@ public class ShapeLevelSelectDialog extends JDialog implements ShapeMatchListene
                 levelProperties.setProperty("level" + (i + 1) + ".locked", Boolean.toString(level.isLocked()));
                 levelProperties.setProperty("level" + (i + 1) + ".completed", Boolean.toString(level.isCompleted()));
             }
-            levelProperties.store(output, null);
+        levelProperties.store(output, null);
+
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+        
     }
+
 
     private void handleEventsUI() {
         this.addComponentListener(new ComponentAdapter() {
@@ -158,8 +143,8 @@ public class ShapeLevelSelectDialog extends JDialog implements ShapeMatchListene
         themes.setBorder(new EmptyBorder(5, 5, 5, 5));
 
         shapeLevelPanel = new ShapeLevelPanel();
-        if(index == 0) {
-        	for (ShapeLevel level : levels) {
+        if (catIndex == 0) {
+            for (ShapeLevel level : levels) {
                 JPanel shapeLevel = shapeLevelPanel.createShapeLevelPanel(level);
                 shapeLevel.addMouseListener(new MouseAdapter() {
                     @Override
@@ -169,8 +154,9 @@ public class ShapeLevelSelectDialog extends JDialog implements ShapeMatchListene
                 });
                 themes.add(shapeLevel);
             }
-        }if(index == 1) {
-        	for (ShapeLevel level : levels) {
+        }
+        if (catIndex == 1) {
+            for (ShapeLevel level : levels) {
                 JPanel letterLevel = shapeLevelPanel.createShapeLevelPanel(level);
                 letterLevel.addMouseListener(new MouseAdapter() {
                     @Override
@@ -181,7 +167,7 @@ public class ShapeLevelSelectDialog extends JDialog implements ShapeMatchListene
                 themes.add(letterLevel);
             }
         }
-        
+
         languageOption.add(themes);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = 0;
@@ -200,15 +186,20 @@ public class ShapeLevelSelectDialog extends JDialog implements ShapeMatchListene
 
     public void handleLevelClick(MouseEvent e, ShapeLevel level) {
     	
-    	if(level.isLocked()) {
-    		return;
-    	}
-    	
-//    	System.out.println("Name: " + level.getName());
-//    	System.out.println("Locked? " + level.isLocked());
-//    	System.out.println("Completed? " + level.isCompleted());
-    	
+
+        if (level.isLocked()) {
+            return;
+        }
+        
         currentLevel = level;
+        int currentIndex = currentLevel.getIndex();
+	    
+	    if(currentIndex < 5) {
+	    	nextLevel = levels.get(currentIndex + 1);
+	    }else {
+	    	nextLevel = null;
+	    }
+//	    System.out.println(currentIndex);
         JFrame parentFrame = (JFrame) SwingUtilities.getWindowAncestor(ShapeLevelSelectDialog.this);
         JDialog parentDialog = (JDialog) SwingUtilities.getWindowAncestor((Component) e.getSource());
         JFrame grandParentFrame = (JFrame) SwingUtilities.getWindowAncestor(parentDialog);
@@ -219,23 +210,21 @@ public class ShapeLevelSelectDialog extends JDialog implements ShapeMatchListene
             landingPageFrame.removeImageLabelPanel();
             
             levelNumber = Integer.parseInt(currentLevel.getName().split(" ")[1]);
-            ShapeModel shapeModel = ShapeModelSingleton.getInstance(gameBoardDialog,landingPageFrame,this,
-              		 shapeMatchListener,levelTopBarPanel,levelNumber,index,level);
-//            landingPageFrame.setGameBoardDialog(gameBoardDialog);
-            LevelTopBarPanel levelTopBarPanel = new LevelTopBarPanel(level.getName(), 
-            		landingPageFrame, gameBoardDialog, this, levelNumber, categoryName, index, level, shapeModel, musicController);
-            gameBoardDialog = new GameBoardDialog(parentFrame, landingPageFrame, this, levelTopBarPanel, levelNumber, index, level); // Pass landingPageFrame
-            
-             
+            ShapeModel shapeModel = ShapeModelSingleton.getInstance(gameBoardDialog, landingPageFrame, this,
+                    shapeMatchListener, levelTopBarPanel, levelNumber, currentIndex, level, nextLevel,catIndex, gameSelectBoardPanel);
+
+            LevelTopBarPanel levelTopBarPanel = new LevelTopBarPanel(level.getName(),
+                    landingPageFrame, gameBoardDialog, this, levelNumber, categoryName, currentIndex, level,nextLevel,shapeModel, musicController, 
+                    catIndex,gameSelectBoardPanel);
+            gameBoardDialog = new GameBoardDialog(parentFrame, landingPageFrame, this, levelTopBarPanel, levelNumber, currentIndex, level, 
+            		nextLevel,catIndex, gameSelectBoardPanel);
+
             landingPageFrame.setGameBoardDialog(gameBoardDialog);
-            
+
             landingPageFrame.add(levelTopBarPanel, BorderLayout.NORTH);
             gameBoardDialog.setVisible(true);
-//            if(gameBoardDialog.isVisible()) {
-//            	levelTopBarPanel.removeMiddlePanel();
-//            }
         }
-        
+
         JDialog set = (JDialog) SwingUtilities.getWindowAncestor((Component) e.getSource());
         set.dispose();
     }
@@ -256,47 +245,54 @@ public class ShapeLevelSelectDialog extends JDialog implements ShapeMatchListene
         int parentY = getParent().getY();
         int parentWidth = getParent().getWidth();
         int parentHeight = getParent().getHeight();
+        int dialogWidth = this.getWidth();
+        int dialogHeight = this.getHeight();
 
-        int dialogWidth = getWidth();
-        int dialogHeight = getHeight();
-        int marginBottom = 20;
-        int dialogX = parentX + (parentWidth - dialogWidth) / 3;
-        int dialogY = parentY + parentHeight - dialogHeight - marginBottom;
+        int dialogX = parentX + (parentWidth - dialogWidth) / 2;
+        int dialogY = parentY + (parentHeight - dialogHeight) / 2;
 
         setLocation(dialogX, dialogY);
     }
 
-    @Override
-    public void onAllShapesMatched() {
-        if (currentLevel != null && !currentLevel.isLocked() && !currentLevel.isCompleted()) {
-            currentLevel.setLocked(false);
-            currentLevel.setCompleted(true);
-            int currentIndex = levels.indexOf(currentLevel);
-            if (currentIndex != -1 && currentIndex < levels.size() - 1) {
-                nextLevel = levels.get(currentIndex + 1);
-                nextLevel.setLocked(false);
-                nextLevel.setCompleted(false);
-            }
-            saveLevelProperties(); 
-            refreshShapeLevelPanel();
-        }
-    }
-
-    public void refreshShapeLevelPanel() {
+    private void refreshShapeLevelPanel() {
         themes.removeAll();
-
         for (ShapeLevel level : levels) {
-            JPanel levelPanel = shapeLevelPanel.createShapeLevelPanel(level);
-            levelPanel.addMouseListener(new MouseAdapter() {
+            JPanel shapeLevel = shapeLevelPanel.createShapeLevelPanel(level);
+            shapeLevel.addMouseListener(new MouseAdapter() {
                 @Override
                 public void mouseClicked(MouseEvent e) {
                     handleLevelClick(e, level);
                 }
             });
-            themes.add(levelPanel);
+            themes.add(shapeLevel);
         }
-
         themes.revalidate();
         themes.repaint();
+    }
+
+    @Override
+    public void onAllShapesMatched() {
+    	int currentIndex = currentLevel.getIndex();
+    	if(currentIndex < 5) {
+	    	nextLevel = levels.get(currentIndex + 1);
+	    }else {
+	    	nextLevel = null;
+	    }
+    	
+        if (currentLevel != null && !currentLevel.isLocked() && !currentLevel.isCompleted()) {
+            currentLevel.setLocked(false);
+            currentLevel.setCompleted(true);
+            if (currentIndex != -1 && currentIndex < levels.size() - 1) {
+                
+                nextLevel.setLocked(false);
+                nextLevel.setCompleted(false);
+                
+            } 
+            else {
+                nextLevel = null; // No next level available
+            }
+            saveLevelProperties();
+            refreshShapeLevelPanel();
+        }
     }
 }

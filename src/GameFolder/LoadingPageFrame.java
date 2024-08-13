@@ -20,7 +20,6 @@ public class LoadingPageFrame extends JFrame {
 
     public LoadingPageFrame() {
         initUI();
-//        playBackgroundMusic("audio\\level_applause.wav");
         addBackgroundMusic();
     }
 
@@ -89,10 +88,10 @@ public class LoadingPageFrame extends JFrame {
             ex.printStackTrace();
         }
         
-        progressBar = new RoundedProgressBar(0, 100);
+        progressBar = new RoundedProgressBar(0, 100, 200, 17);
         progressBar.setValue(0);
         progressBar.setStringPainted(true);
-        progressBar.setForeground(new Color(50, 205, 50)); // Set foreground color (e.g., lime green)
+        progressBar.setForeground(new Color(50, 205, 50));
         progressBar.setOpaque(false);
         
         GridBagConstraints gbc = new GridBagConstraints();
@@ -103,7 +102,7 @@ public class LoadingPageFrame extends JFrame {
         pageContainer.add(progressBar, gbc);
 
         // Start the progress bar
-        startProgressInSteps(15000);        
+        startProgressInSteps(17000);        
     }
     
     public void displayLanguageDialog() {
@@ -112,15 +111,6 @@ public class LoadingPageFrame extends JFrame {
     }
 
     private void playBackgroundMusic(String filePath) {
-//        try {
-//            File audioFile = new File(filePath);
-//            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
-//            Clip audioClip = AudioSystem.getClip();
-//            audioClip.open(audioStream);
-//            audioClip.start();
-//        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-//            e.printStackTrace();
-//        }
     	
     	try {
             File audioFile = new File(filePath);
@@ -150,7 +140,7 @@ public class LoadingPageFrame extends JFrame {
         }
     }
     public void startProgressInSteps(int durationMs) {
-        int totalSteps = 50; // 100 (max value) / 5 (increment per step)
+        int totalSteps = 100;
         int stepDuration = durationMs / totalSteps;
 
         SwingWorker<Void, Integer> worker = new SwingWorker<Void, Integer>() {
@@ -162,11 +152,10 @@ public class LoadingPageFrame extends JFrame {
 
                 while (System.currentTimeMillis() <= endTime) {
                     publish(progressValue);
-                    progressValue += 2; // Increment by 5 for each step
+                    progressValue += 1;
                     Thread.sleep(stepDuration);
                 }
 
-                // Ensure the progress reaches 100%
                 if (progressValue <= 100) {
                     publish(100);
                 }
@@ -210,12 +199,10 @@ public class LoadingPageFrame extends JFrame {
             pageContainer.repaint();
         }
     }
-    
     public void addBackgroundMusic() {
-    	playBackgroundMusic("C:\\Users\\GABSIA GAMUAH JULIUS\\Downloads\\GameFolder\\game_sound.wav");
+    	playBackgroundMusic("audio\\game_sound.wav");
     }
 
-    // Method to stop and release background music
     public void removeBackgroundMusic() {
         if (backgroundMusicClip != null) {
             backgroundMusicClip.stop();

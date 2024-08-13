@@ -12,12 +12,12 @@ public class GameData {
 
     private GameData() {
         prefs = Preferences.userNodeForPackage(GameData.class);
-        this.totalHints = prefs.getInt(HINTS_KEY, 0); // Default to 0 if not found
-        this.totalCoins = prefs.getInt(COINS_KEY, 0); // Default to 0 if not found
-//        prefs.putInt(HINTS_KEY, 0);
-//        prefs.putInt(COINS_KEY, 0);
-//        this.totalHints = 0;
-//        this.totalCoins = 0;
+//        this.totalHints = prefs.getInt(HINTS_KEY, 0); // Default to 0 if not found
+//        this.totalCoins = prefs.getInt(COINS_KEY, 0); // Default to 0 if not found
+        prefs.putInt(HINTS_KEY, 0);
+        prefs.putInt(COINS_KEY, 0);
+        this.totalHints = 0;
+        this.totalCoins = 0;
     }
 
     public static synchronized GameData getInstance() {

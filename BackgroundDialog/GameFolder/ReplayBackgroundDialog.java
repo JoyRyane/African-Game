@@ -11,13 +11,14 @@ public class ReplayBackgroundDialog extends JDialog {
 	ShapeLevelSelectDialog shapeLevelSelectDialog;
 	GameBoardDialog gameBoardDialog;
 	private LevelTopBarPanel levelTopBarPanel;
-	private int levelNumber, index;
+	private int levelNumber, index, catIndex;
 //	private List<ShapeLevel> levels;
-	private ShapeLevel shapeLevel;
+	private ShapeLevel shapeLevel, nextLevel;
+	private GameSelectBoardPanel gameSelectBoardPanel;
 	
     public ReplayBackgroundDialog(JFrame parent, ShapeLevelSelectDialog shapeLevelSelectDialog, 
     		GameBoardDialog gameBoardDialog, LevelTopBarPanel levelTopBarPanel,int levelNumber, 
-    		int index, ShapeLevel shpeLevel) {
+    		int index, ShapeLevel shapeLevel, ShapeLevel nextLevel,int catIndex, GameSelectBoardPanel gameSelectBoardPanel) {
         super(parent, "Fullscreen Popup", false);
         this.shapeLevelSelectDialog = shapeLevelSelectDialog;
         this.gameBoardDialog  = gameBoardDialog;
@@ -26,6 +27,9 @@ public class ReplayBackgroundDialog extends JDialog {
         this.levelNumber = levelNumber;
 //        this.levels = levels;
         this.shapeLevel = shapeLevel;
+        this.nextLevel = nextLevel;
+        this.gameSelectBoardPanel = gameSelectBoardPanel;
+        this.catIndex = catIndex;
         parent.addComponentListener(new java.awt.event.ComponentAdapter() {
             @Override
             public void componentMoved(ComponentEvent e) {
@@ -44,7 +48,7 @@ public class ReplayBackgroundDialog extends JDialog {
         updateDialogSizeAndPosition();
         
         dialog = new ReplayDialog((JFrame) getParent(), shapeLevelSelectDialog, 
-        		gameBoardDialog,levelTopBarPanel,levelNumber, index, shapeLevel);
+        		gameBoardDialog,levelTopBarPanel,levelNumber, index, shapeLevel, nextLevel,catIndex, gameSelectBoardPanel);
         
 //        dialog.setVisible(true);
 //        

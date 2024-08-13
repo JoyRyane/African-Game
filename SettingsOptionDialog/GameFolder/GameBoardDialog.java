@@ -141,13 +141,14 @@ public class GameBoardDialog extends JDialog {
     private LandingPageFrame landingPageFrame;
     private ShapeLevelSelectDialog shapeLevelSelectDialog;
     private LevelTopBarPanel levelTopBarPanel;
-    private int levelNumber, index;
-    private ShapeLevel nextLevel;
-//    private List<ShapeLevel> levels;
-    private ShapeLevel shapeLevel;
+    private int levelNumber, index, catIndex;
+    private ShapeLevel shapeLevel, nextLevel;
+    private GameSelectBoardPanel gameSelectBoardPanel;
+   
 
     public GameBoardDialog(JFrame parent, LandingPageFrame landingPageFrame,ShapeLevelSelectDialog shapeLevelSelectDialog, 
-    		LevelTopBarPanel levelTopBarPanel, int levelNumber, int index, ShapeLevel shapeLevel) {
+    		LevelTopBarPanel levelTopBarPanel, int levelNumber, int index, ShapeLevel shapeLevel, ShapeLevel nextLevel,int catIndex, 
+    		GameSelectBoardPanel gameSelectBoardPanel) {
         super(parent, "Game Board", false);
         this.landingPageFrame = landingPageFrame;
         this.shapeLevelSelectDialog = shapeLevelSelectDialog;
@@ -155,6 +156,8 @@ public class GameBoardDialog extends JDialog {
         this.levelNumber = levelNumber;
         this.index = index;
         this.shapeLevel = shapeLevel;
+        this.nextLevel = nextLevel;
+        this.gameSelectBoardPanel = gameSelectBoardPanel;
 //        this.levels = levels;
         initUI(levelNumber);
         layoutUI();
@@ -164,6 +167,8 @@ public class GameBoardDialog extends JDialog {
         
 //        levelTopBarPanel.removeMiddlePanel();
 //        System.out.println("Level +" levels.is);
+//        System.out.println(nextLevel.isLocked());
+//        System.out.println(nextLevel.isCompleted());
     }
 
     @Override
@@ -225,7 +230,7 @@ public class GameBoardDialog extends JDialog {
     }
     private void addShapeModel() {
     	shapeModel = new ShapeModel(this, landingPageFrame, shapeLevelSelectDialog,
-        		shapeLevelSelectDialog,levelTopBarPanel, levelNumber, index, shapeLevel);
+        		shapeLevelSelectDialog,levelTopBarPanel, catIndex, levelNumber, index, shapeLevel, nextLevel, gameSelectBoardPanel);
         contentPanel.add(shapeModel, BorderLayout.CENTER);
     }
 

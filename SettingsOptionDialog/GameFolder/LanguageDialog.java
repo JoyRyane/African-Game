@@ -51,8 +51,6 @@ public class LanguageDialog extends JDialog {
         contentPanel.setOpaque(false);
         contentPanel.setBackground(null);
         
-        
-        
         ImageIcon closeIcon = new ImageIcon("icon\\close.png");
         Image closeImg = closeIcon.getImage();
         Image resizedCloseImg = closeImg.getScaledInstance(30, 30, Image.SCALE_SMOOTH);

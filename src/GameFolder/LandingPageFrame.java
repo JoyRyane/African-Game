@@ -4,6 +4,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioInputStream;
@@ -13,16 +14,22 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+
+import java.util.Properties;
 import java.util.prefs.Preferences;
 
 public class LandingPageFrame extends JFrame implements BackgroundMusicController{
      private BackgroundPanel landingContainer;
-     private JLabel imageLabel,rateUsLabel,rateUsIconLabel;
+     private JLabel imageLabel,rateUsLabel,rateUsIconLabel, starLabel, starIconLabel, numberIconLabel,
+     letterIconLabel, fruitIconLabel;
      private GameSelectBoardPanel gameSelect;
      private JPanel topRightPanel,labelPanel,settingsOption, 
-     settingsPanel,aboutPanel,dailyChallengePanel, centerPanel, landingPageBigContainer;
-     private ImageIcon rateUsIcon, finalRateUsIcon;
-     private Image ruIcon, resizedruIcon;
+     settingsPanel,aboutPanel,dailyChallengePanel, centerPanel, landingPageBigContainer,iconsPanel,
+     starIconPanel, numberIconPanel, lettersIconPanel;
+     private ImageIcon rateUsIcon, finalRateUsIcon, finalStarIcon, starIcon, numberIcon, finalNumberIcon,
+     letterIcon, finalLetterIcon, fruitIcon,finalFruitIcon;
+     private Image ruIcon, resizedruIcon, resizedSIcon, sIcon, nIcon, resizedNIcon, lIcon, resizedLIcon, 
+     fIcon, resizedFIcon;
      private RoundedPanel rateUsBigContainer;
      private SettingsIconPanel settingsIconPanel;
      private GameBoardDialog gameBoardDialog;
@@ -30,12 +37,17 @@ public class LandingPageFrame extends JFrame implements BackgroundMusicControlle
      private SettingsDialog settingsDialog;
      private LevelTopBarPanel levelTopBarPanel;
      private Clip backgroundMusicClip;
+     private RoundedProgressBar progressBar;
+     private CategoryProgressData categoryProgressData;
+     private Properties props;
      
      
      public LandingPageFrame() {
     	 
          settingsDialog = new SettingsDialog(this,this);
+         categoryProgressData = CategoryProgressData.getInstance();
          
+        initProperties();
         initUI();
         layoutUI(); 
         
@@ -44,7 +56,18 @@ public class LandingPageFrame extends JFrame implements BackgroundMusicControlle
         }else {
         	removeBackgroundMusic();
         }
-    }  
+    } 
+     
+     private void initProperties() {
+         props = new Properties();
+         try {
+             FileInputStream in = new FileInputStream("resources/config.properties");
+             props.load(in);
+             in.close();
+         } catch (IOException e) {
+             e.printStackTrace();
+         }
+     }
 
     private void initUI() {   
         setTitle("Item Sort");
@@ -60,50 +83,82 @@ public class LandingPageFrame extends JFrame implements BackgroundMusicControlle
         } catch (IOException ex) {
             ex.printStackTrace(); 
         }	
-
-        try {
-            BufferedImage backgroundImg = ImageIO.read(new File("icon\\platform.jpeg"));
-            landingContainer = new BackgroundPanel(backgroundImg);
-        } catch (IOException e) {
-            e.printStackTrace();
-            landingContainer = new BackgroundPanel(null);
-        }
+        String imagePath = props.getProperty("backgroundImagePath");
+        BufferedImage backgroundImg = loadImage(imagePath);
+        landingContainer = new BackgroundPanel(backgroundImg);
         landingContainer.setLayout(new BorderLayout());
         landingContainer.setBorder(new EmptyBorder(27,20,0,22));
         
         landingPageBigContainer = new JPanel();
         landingPageBigContainer.setBackground(Color.WHITE);        
-        
-//        levelTopBarPanel = new LevelTopBarPanel("Welcome",this,null,null,0, null,0);
-        
+                
         gameSelect = new GameSelectBoardPanel(this,this);
         
         topRightPanel = new JPanel();
         topRightPanel.setOpaque(false);
-        topRightPanel.setPreferredSize(new Dimension(110, 100));
+        topRightPanel.setPreferredSize(new Dimension(130, 100));
         
         settingsOption = new JPanel();
         settingsOption.setOpaque(false); 
         
         rateUsBigContainer = new RoundedPanel(45,new Color(99, 181, 147));
-        rateUsBigContainer.setBorder(new EmptyBorder(7,2,7,2));
+        rateUsBigContainer.setBorder(new EmptyBorder(7,7,7,7));
         rateUsBigContainer.setLayout(new BorderLayout());
-        rateUsBigContainer.setPreferredSize(new Dimension(110, 70));
+        rateUsBigContainer.setPreferredSize(new Dimension(130, 90));
         
         rateUsBigContainer.setCursor(new Cursor(Cursor.HAND_CURSOR));
         
-        rateUsLabel = new JLabel("Rate Us");
+        rateUsLabel = new JLabel("Progress");
         rateUsLabel.setForeground(Color.WHITE);
         rateUsLabel.setFont(new Font(rateUsLabel.getFont().getName(), Font.BOLD | Font.ITALIC, 20));
+        
+        progressBar = new RoundedProgressBar(0, 100, 130, 12);
+        progressBar.setStringPainted(true);
+        progressBar.setForeground(new Color(50, 205, 50));
+        progressBar.setOpaque(false);
         
         labelPanel = new JPanel();
         labelPanel.setOpaque(false);
         
-        rateUsIcon = new ImageIcon("icon\\rateUsIcon.png");
-        ruIcon = rateUsIcon.getImage();
-        resizedruIcon = ruIcon.getScaledInstance(80, 20, Image.SCALE_SMOOTH);
-        finalRateUsIcon = new ImageIcon(resizedruIcon);
-        rateUsIconLabel = new JLabel(finalRateUsIcon); 
+        starIcon = new ImageIcon("icon\\star.png");
+        sIcon = starIcon.getImage();
+        resizedSIcon = sIcon.getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+        finalStarIcon = new ImageIcon(resizedSIcon);
+        starIconLabel = new JLabel(finalStarIcon); 
+        
+        numberIcon = new ImageIcon("icon\\numbers.png");
+        nIcon = numberIcon.getImage();
+        resizedNIcon = nIcon.getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+        finalNumberIcon = new ImageIcon(resizedNIcon);
+        numberIconLabel = new JLabel(finalNumberIcon); 
+        
+        letterIcon = new ImageIcon("icon\\letters.png");
+        lIcon = letterIcon.getImage();
+        resizedLIcon = lIcon.getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+        finalLetterIcon = new ImageIcon(resizedLIcon);
+        letterIconLabel = new JLabel(finalLetterIcon); 
+        
+        fruitIcon = new ImageIcon("icon\\fruits.png");
+        fIcon = fruitIcon.getImage();
+        resizedFIcon = fIcon.getScaledInstance(15, 15, Image.SCALE_SMOOTH);
+        finalFruitIcon = new ImageIcon(resizedFIcon);
+        fruitIconLabel = new JLabel(finalFruitIcon); 
+        
+        iconsPanel = new JPanel(new BorderLayout());
+        iconsPanel.setBorder(new EmptyBorder(0,12,0,0));
+        iconsPanel.setOpaque(false);
+        
+        starIconPanel = new JPanel(new FlowLayout(FlowLayout.LEADING));
+        starIconPanel.setPreferredSize(new Dimension(20,20));
+        starIconPanel.setOpaque(false);
+        
+        numberIconPanel = new JPanel( new FlowLayout(FlowLayout.CENTER));
+        numberIconPanel.setPreferredSize(new Dimension(20,20));
+        numberIconPanel.setOpaque(false);
+        
+        lettersIconPanel = new JPanel(new FlowLayout(FlowLayout.TRAILING));
+        lettersIconPanel.setPreferredSize(new Dimension(50,20));
+        lettersIconPanel.setOpaque(false);
         
         settingsIconPanel = new SettingsIconPanel(); 
         settingsPanel = settingsIconPanel.createSettingsPanel(
@@ -160,7 +215,6 @@ public class LandingPageFrame extends JFrame implements BackgroundMusicControlle
             centerPanel.setOpaque(false);
             centerPanel.add(imageLabel, BorderLayout.NORTH);
             
-//            landingContainer.add(centerPanel,BorderLayout.CENTER);
             addIconImage();
 
             addComponentListener(new ComponentAdapter() {
@@ -183,8 +237,16 @@ public class LandingPageFrame extends JFrame implements BackgroundMusicControlle
         }
         
         labelPanel.add(rateUsLabel);
+        iconsPanel.add(starIconPanel, BorderLayout.WEST);
+        iconsPanel.add(numberIconPanel, BorderLayout.CENTER);
+        iconsPanel.add(lettersIconPanel, BorderLayout.EAST);
+        numberIconPanel.add(numberIconLabel);
+        starIconPanel.add(starIconLabel);
+        lettersIconPanel.add(letterIconLabel);
+        lettersIconPanel.add(fruitIconLabel);
         rateUsBigContainer.add(labelPanel, BorderLayout.NORTH);
-        rateUsBigContainer.add(rateUsIconLabel, BorderLayout.SOUTH);
+        rateUsBigContainer.add(iconsPanel, BorderLayout.CENTER);
+        rateUsBigContainer.add(progressBar, BorderLayout.SOUTH);
         
         settingsOption.add(settingsPanel);
         settingsOption.add(aboutPanel);
@@ -193,9 +255,7 @@ public class LandingPageFrame extends JFrame implements BackgroundMusicControlle
         topRightPanel.add(rateUsBigContainer);
         topRightPanel.add(settingsOption);
         
-//        landingContainer.add(topRightPanel,BorderLayout.EAST);
         addTopRightPanel();
-//        gameSelect.setVisible(true);
         addGameSelectBoardPanel();
         setContentPane(landingContainer);
         
@@ -220,15 +280,6 @@ public class LandingPageFrame extends JFrame implements BackgroundMusicControlle
     }
 
     private void playBackgroundMusic(String filePath) {
-//      try {
-//          File audioFile = new File(filePath);
-//          AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
-//          Clip audioClip = AudioSystem.getClip();
-//          audioClip.open(audioStream);
-//          audioClip.start();
-//      } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
-//          e.printStackTrace();
-//      }
   	
   	try {
           File audioFile = new File(filePath);
@@ -247,6 +298,11 @@ public class LandingPageFrame extends JFrame implements BackgroundMusicControlle
 
         public BackgroundPanel(BufferedImage img) {
             this.image = img;
+        }
+        
+        public void setImage(BufferedImage img) {
+            this.image = img;
+            repaint();
         }
 
         @Override
@@ -288,6 +344,12 @@ public class LandingPageFrame extends JFrame implements BackgroundMusicControlle
         }
     }
     
+    public void removeGameSelectBoardPanel() {
+        if (gameSelect != null) {
+        	gameSelect.setVisible(false);
+        }
+    }
+    
     public void setGameBoardDialog(GameBoardDialog gameBoardDialog) {
         this.gameBoardDialog = gameBoardDialog;
     }
@@ -321,7 +383,7 @@ public class LandingPageFrame extends JFrame implements BackgroundMusicControlle
     
     @Override
     public void addBackgroundMusic() {
-    	playBackgroundMusic("C:\\Users\\GABSIA GAMUAH JULIUS\\Downloads\\GameFolder\\fun_soundFinal2.wav");
+    	playBackgroundMusic("audio\\fun_soundFinal2.wav");
     }
     
     @Override
@@ -330,6 +392,27 @@ public class LandingPageFrame extends JFrame implements BackgroundMusicControlle
             backgroundMusicClip.stop();
             backgroundMusicClip.close();
         }
+    }
+    private BufferedImage loadImage(String path) {
+        try {
+            return ImageIO.read(new File(path));
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    public void setBackgroundImage(String imagePath) {
+        BufferedImage newBackground = loadImage(imagePath);
+        if (newBackground != null) {
+            landingContainer.setImage(newBackground);
+            landingContainer.repaint();
+        }
+    }
+    public void increaseProgressBar(int increment) {
+    	int newValue = progressBar.getValue() + increment;
+    	progressBar.setValue(newValue);
+    	categoryProgressData.setProgress(newValue);
     }
     
     public static void main(String[] args) {

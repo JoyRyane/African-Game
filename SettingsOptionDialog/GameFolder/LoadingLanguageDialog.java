@@ -153,7 +153,6 @@ public class LoadingLanguageDialog extends JDialog {
                     }
                 }
                 if (grandParentFrame instanceof LoadingPageFrame) {
-                    // Cast the grand parent frame to LoadingPageFrame
                     LoadingPageFrame loadingPageFrame = (LoadingPageFrame) grandParentFrame;
                     GreetingsDialog greetings = new GreetingsDialog(loadingPageFrame);
 
@@ -162,7 +161,6 @@ public class LoadingLanguageDialog extends JDialog {
                     greetings.setVisible(true);
                     
                     Timer timer = new Timer(3000, event -> {
-//                    	loadingPageFrame.remove(grandParentFrame)
                     	loadingPageFrame.removeBackgroundMusic();
                     	loadingPageFrame.dispose();
                     	openLandingPage();

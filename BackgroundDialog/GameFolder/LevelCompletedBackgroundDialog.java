@@ -10,14 +10,26 @@ public class LevelCompletedBackgroundDialog extends JDialog {
 	private LevelCompletedDialog dialog;
 	private LevelTopBarPanel levelTopBarPanel;
 	private ShapeLevelSelectDialog shapeLevelSelectDialog;
-	int levelNumber, index;
+	int levelNumber, index, catIndex;
+	private ShapeMatchListener shapeMatchListener;
+	private ShapeLevel shapeLevel, nextLevel;
+	private LandingPageFrame landingPageFrame;
+	private GameSelectBoardPanel gameSelectBoardPanel;
     public LevelCompletedBackgroundDialog(JFrame parent,ShapeLevelSelectDialog shapeLevelSelectDialog,
-    		LevelTopBarPanel levelTopBarPanel, int levelNumber, int index) {
+    		LevelTopBarPanel levelTopBarPanel,ShapeMatchListener shapeMatchListener,ShapeLevel shapeLevel,
+    		ShapeLevel nextLevel,int levelNumber, int index, LandingPageFrame landingPageFrame,
+    		int catIndex,GameSelectBoardPanel gameSelectBoardPanel) {
         super(parent, "Fullscreen Popup", false);
         this.shapeLevelSelectDialog = shapeLevelSelectDialog;
         this.levelTopBarPanel = levelTopBarPanel;
         this.levelNumber = levelNumber;
+        this.shapeMatchListener = shapeMatchListener;
+        this.shapeLevel = shapeLevel;
+        this.nextLevel = nextLevel;
         this.index = index;
+        this.landingPageFrame = landingPageFrame;
+        this.gameSelectBoardPanel = gameSelectBoardPanel;
+        this.catIndex = catIndex;
         parent.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentMoved(ComponentEvent e) {
@@ -28,6 +40,7 @@ public class LevelCompletedBackgroundDialog extends JDialog {
             }
         });
         initUI();
+        
     }
 
 	private void initUI() {
@@ -35,13 +48,9 @@ public class LevelCompletedBackgroundDialog extends JDialog {
         setBackground(new Color(0,0,0,200));
         updateDialogSizeAndPosition();
         
-        dialog = new LevelCompletedDialog((JFrame) getParent(),shapeLevelSelectDialog,levelTopBarPanel, levelNumber, index);
+        dialog = new LevelCompletedDialog((JFrame) getParent(),shapeLevelSelectDialog,levelTopBarPanel,
+        		shapeMatchListener,shapeLevel,nextLevel, levelNumber, index, landingPageFrame,catIndex, gameSelectBoardPanel);
         
-//        levelTopBarPanel.removeFromParent();
-        
-//        dialog.setVisible(true);
-//        
-//        dialog.setAlwaysOnTop(true);
     }
 	
     private void updateDialogSizeAndPosition() {

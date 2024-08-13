@@ -7,11 +7,20 @@ import java.awt.geom.RoundRectangle2D;
 
 public class RoundedProgressBar extends JProgressBar {
 
-    public RoundedProgressBar(int min, int max) {
+    private int width;
+    private int height;
+
+    public RoundedProgressBar(int min, int max, int width, int height) {
         super(min, max);
+        this.width = width;
+        this.height = height;
         setUI(new RoundedProgressBarUI());
-        setBorder(BorderFactory.createEmptyBorder(0, 10, 0,10));
-//        setBackground(new Color(0,0,0,0));
+        setBorder(BorderFactory.createEmptyBorder(0, 10, 0, 10));
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return new Dimension(width, height);
     }
 
     private static class RoundedProgressBarUI extends BasicProgressBarUI {
@@ -22,14 +31,14 @@ public class RoundedProgressBar extends JProgressBar {
 
             int width = progressBar.getWidth();
             int height = progressBar.getHeight();
-            int arc = 20;
+            int arc = 15;
 
             double percentage = progressBar.getPercentComplete();
+//            System.out.println(percentage);
             int fillWidth = (int) (width * percentage);
 
             // Draw the background
-//            g2d.setColor(progressBar.getBackground());
-            g2d.setColor(new Color(0,0,0,100));
+            g2d.setColor(new Color(0, 0, 0, 100));
             g2d.fillRoundRect(0, 0, width, height, arc, arc);
 
             // Draw the progress
@@ -59,4 +68,3 @@ public class RoundedProgressBar extends JProgressBar {
         }
     }
 }
-
